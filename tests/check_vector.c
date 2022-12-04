@@ -9,16 +9,27 @@ START_TEST(test_allocation)
 {
     struct vector_context_int ctx = vector_init1_int(10);
     ck_assert_int_eq(ctx.capacity, 10);
-    vector_destroy_int(ctx);
+    vector_destroy_int(&ctx);
 }
 END_TEST
  
 START_TEST(test_check_bounds)
 {
     struct vector_context_int ctx = vector_init1_int(10);
-    ck_assert(!is_inside_bounds_int(ctx, 1));
-    ck_assert(!is_inside_bounds_int(ctx, -1));
-    vector_destroy_int(ctx);
+    ck_assert(!is_inside_bounds_int(&ctx, 1));
+    ck_assert(!is_inside_bounds_int(&ctx, -1));
+    vector_destroy_int(&ctx);
+}
+END_TEST
+
+START_TEST(test_add)
+{
+    struct vector_context_int ctx = vector_init1_int(10);
+    vector_add(&ctx, 1);
+    vector_add(&ctx, 2);
+    vector_add(&ctx, 3);
+    ck_assert(is_vector_equal(&ctx, 3, 1, 2 ,3));
+    vector_destroy_int(&ctx);
 }
 END_TEST
 
@@ -27,6 +38,7 @@ Suite * tests(void)
     Suite *s;
     TCase *tc_core;
     TCase *tc_bounds;
+    TCase *tc_add;
 
     s = suite_create("vector");
     
@@ -37,6 +49,10 @@ Suite * tests(void)
     tc_bounds = tcase_create("Bounds");
     tcase_add_test(tc_bounds, test_check_bounds);
     suite_add_tcase(s, tc_bounds);
+
+    tc_add = tcase_create("Add");
+    tcase_add_test(tc_add, test_add);
+    suite_add_tcase(s, tc_add);
 
     return s;
 }
