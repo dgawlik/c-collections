@@ -2,10 +2,12 @@
 #include <check.h>
 #include "../include/vector.h"
  
- START_TEST(test_identity)
+ START_TEST(test_allocation)
  {
-     ck_assert_int_eq(5, 5);
-     ck_assert_str_eq("USD", "USD");
+    VECTOR_DEFINE_ALL(int, int);
+    struct vector_context_int ctx = vector_init1_int(10);
+    ck_assert_int_eq(ctx.capacity, 10);
+    vector_destroy_int(ctx);
  }
  END_TEST
  
@@ -16,7 +18,7 @@ Suite * tests(void)
 
     s = suite_create("vector");
     tc_core = tcase_create("Core");
-    tcase_add_test(tc_core, test_identity);
+    tcase_add_test(tc_core, test_allocation);
     suite_add_tcase(s, tc_core);
 
     return s;
