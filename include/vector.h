@@ -62,27 +62,70 @@ enum vector_status {
         return idx >= 0 && idx < ctx->length;                                   \
     };                                                                          \
 
+#define VECTOR_GROW(TYPE, SUFFIX)                                               \
+    void vector_grow_##SUFFIX(struct vector_context_##SUFFIX* ctx)              \
+    {                                                                           \
+        TYPE* newArray = (TYPE*) malloc(sizeof(TYPE)*ctx->capacity*2);          \
+        memcpy(newArray, ctx->array, sizeof(TYPE)*ctx->capacity);               \
+        free(ctx->array);                                                       \
+        ctx->array = newArray;                                                  \
+        ctx->capacity *= 2;                                                     \
+                                                                                \
+    };                                                                          \   
+
+#define VECTOR_MOVE_RIGHT(TYPE, SUFFIX)                                         \
+    void vector_move_right_##SUFFIX(struct vector_context_##SUFFIX* ctx, int idx)        \
+    {                                                                           \
+        for(int i=ctx->length-1;i>=idx;i--)                                     \
+        {                                                                       \
+            ctx->array[i+1] = ctx->array[i];                                    \
+        }                                                                       \
+    }                                                                           \
+
 
 #define VECTOR_ADD(TYPE, SUFFIX)                                                 \
-    void vector_add(struct vector_context_##SUFFIX* ctx, TYPE elem)              \
+    void vector_add_##SUFFIX(struct vector_context_##SUFFIX* ctx, TYPE elem)     \
     {                                                                            \
         if(ctx->length == ctx->capacity)                                         \
         {                                                                        \
-            TYPE* newArray = (TYPE*) malloc(sizeof(TYPE)*ctx->capacity*2);       \
-            memcpy(newArray, ctx->array, sizeof(TYPE)*ctx->capacity);            \
-            free(ctx->array);                                                    \
-            ctx->array = newArray;                                               \
-            ctx->capacity *= 2;                                                  \
+            vector_grow_##SUFFIX(ctx);                                           \
         }                                                                        \
                                                                                  \
         ctx->array[ctx->length] = elem;                                          \
         ctx->length++;                                                           \
     }
 
+#define VECTOR_INSERT(TYPE, SUFFIX)                                                                     \
+    enum vector_status vector_insert_##SUFFIX(struct vector_context_##SUFFIX* ctx, TYPE elem, int idx)  \
+    {                                                                                                   \
+        if(!is_inside_bounds_##SUFFIX(ctx, idx))                                                        \
+        {                                                                                               \
+            return OUT_OF_BOUNDS;                                                                       \
+        }                                                                                               \
+                                                                                                        \
+        if(ctx->length == ctx->capacity)                                                                \
+        {                                                                                               \
+            vector_grow_##SUFFIX(ctx);                                                                  \
+        }                                                                                               \
+                                                                                                        \
+        vector_move_right_##SUFFIX(ctx, idx);                                                           \
+        ctx->array[idx] = elem;                                                                         \
+        ctx->length++;                                                                                  \
+                                                                                                        \
+        return OK;                                                                                      \
+    }                                                                                                   \
+
+
+
+
+
 #define VECTOR_DEFINE_ALL(TYPE, SUFFIX)                                  \
     VECTOR_CONTEXT(TYPE, SUFFIX)                                         \
     VECTOR_INIT(TYPE, SUFFIX)                                            \
     VECTOR_DESTROY(TYPE, SUFFIX)                                         \
     VECTOR_CHECK_BOUNDS(TYPE, SUFFIX)                                    \
+    VECTOR_GROW(TYPE, SUFFIX)                                            \
+    VECTOR_MOVE_RIGHT(TYPE, SUFFIX)                                      \
     VECTOR_ADD(TYPE, SUFFIX)                                             \
+    VECTOR_INSERT(TYPE, SUFFIX)                                          \
     VECTOR_ASSERT(TYPE, SUFFIX)
