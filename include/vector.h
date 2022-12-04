@@ -1,6 +1,10 @@
 #include <stdlib.h>
 
 
+enum vector_status {
+    OK,
+    OUT_OF_BOUNDS
+};
 
 #define VECTOR_CONTEXT(TYPE, SUFFIX) \
     struct vector_context_##SUFFIX   \
@@ -21,7 +25,7 @@
                                                                          \
         return ctx;                                                      \
     };                                                                   \
-                                                                         \ 
+                                                                         \
     struct vector_context_##SUFFIX vector_init0_##SUFFIX()               \
     {                                                                    \
         return vector_init1_##SUFFIX(10);                                \
@@ -36,8 +40,14 @@
         free(ctx.array);                                                 \
     };                                                                   \
 
+#define VECTOR_CHECK_BOUNDS(TYPE, SUFFIX)                                      \
+    int is_inside_bounds_##SUFFIX(struct vector_context_##SUFFIX ctx, int idx) \
+    {                                                                          \
+        return idx >= 0 && idx < ctx.length;                                   \
+    };                                                                         \
 
 #define VECTOR_DEFINE_ALL(TYPE, SUFFIX)                                  \
     VECTOR_CONTEXT(TYPE, SUFFIX)                                         \
     VECTOR_INIT(TYPE, SUFFIX)                                            \
-    VECTOR_DESTROY(TYPE, SUFFIX)            
+    VECTOR_DESTROY(TYPE, SUFFIX)                                         \
+    VECTOR_CHECK_BOUNDS(TYPE, SUFFIX)    

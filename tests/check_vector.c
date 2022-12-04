@@ -2,31 +2,47 @@
 #include <check.h>
 #include "../include/vector.h"
  
- START_TEST(test_allocation)
- {
-    VECTOR_DEFINE_ALL(int, int);
+
+VECTOR_DEFINE_ALL(int, int);
+
+START_TEST(test_allocation)
+{
     struct vector_context_int ctx = vector_init1_int(10);
     ck_assert_int_eq(ctx.capacity, 10);
     vector_destroy_int(ctx);
- }
- END_TEST
+}
+END_TEST
  
+START_TEST(test_check_bounds)
+{
+    struct vector_context_int ctx = vector_init1_int(10);
+    ck_assert(!is_inside_bounds_int(ctx, 1));
+    ck_assert(!is_inside_bounds_int(ctx, -1));
+    vector_destroy_int(ctx);
+}
+END_TEST
+
 Suite * tests(void)
 {
     Suite *s;
     TCase *tc_core;
+    TCase *tc_bounds;
 
     s = suite_create("vector");
+    
     tc_core = tcase_create("Core");
     tcase_add_test(tc_core, test_allocation);
     suite_add_tcase(s, tc_core);
+
+    tc_bounds = tcase_create("Bounds");
+    tcase_add_test(tc_bounds, test_check_bounds);
+    suite_add_tcase(s, tc_bounds);
 
     return s;
 }
 
  int main(void)
  {
-    return 0;
     int number_failed;
     Suite *s;
     SRunner *sr;
@@ -34,7 +50,7 @@ Suite * tests(void)
     s = tests();
     sr = srunner_create(s);
 
-    srunner_run_all(sr, CK_NORMAL);
+    srunner_run_all(sr, CK_VERBOSE);
     number_failed = srunner_ntests_failed(sr);
     srunner_free(sr);
     return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
