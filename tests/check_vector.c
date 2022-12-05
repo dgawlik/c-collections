@@ -82,6 +82,30 @@ START_TEST(test_pop)
 }
 END_TEST
 
+START_TEST(test_remove)
+{
+    struct vector_context_int ctx = vector_init1_int(2);
+    vector_push_int(&ctx, 1);
+    vector_push_int(&ctx, 2);
+    vector_push_int(&ctx, 3);
+
+
+    int rm1;
+    vector_remove_int(&ctx, 1, &rm1);
+    ck_assert_int_eq(rm1, 2);
+
+    int rm2;
+    vector_remove_int(&ctx, 0, &rm2);
+    ck_assert_int_eq(rm2, 1);
+
+    int rm3;
+    vector_remove_int(&ctx, 0, &rm3);
+    ck_assert_int_eq(rm3, 3);
+
+    vector_destroy_int(&ctx);
+}
+END_TEST
+
 
 #define TEST_ADD(label, var, test)      \
     TCase* var = tcase_create(label);   \
@@ -99,6 +123,7 @@ Suite * tests(void)
     TEST_ADD("Grow", tc_grow, test_grow);
     TEST_ADD("Insert", tc_insert, test_insert);
     TEST_ADD("Pop", tc_pop, test_pop);
+    TEST_ADD("Remove", tc_remove, test_remove);
     
     return s;
 }

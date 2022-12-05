@@ -82,6 +82,15 @@ enum vector_status {
         }                                                                       \
     }                                                                           \
 
+#define VECTOR_MOVE_LEFT(TYPE, SUFFIX)                                              \
+    void vector_move_left_##SUFFIX(struct vector_context_##SUFFIX* ctx, int idx)    \
+    {                                                                               \
+        for(int i=idx;i<ctx->length;i++)                                            \
+        {                                                                           \
+            ctx->array[i] = ctx->array[i+1];                                        \
+        }                                                                           \
+    }                                                                               \
+
 
 #define VECTOR_PUSH(TYPE, SUFFIX)                                                \
     void vector_push_##SUFFIX(struct vector_context_##SUFFIX* ctx, TYPE elem)    \
@@ -107,6 +116,20 @@ enum vector_status {
         ctx->length--;                                                                        \
         return OK;                                                                            \
     }
+
+#define VECTOR_REMOVE(TYPE, SUFFIX)                                                                         \
+    enum vector_status vector_remove_##SUFFIX(struct vector_context_##SUFFIX* ctx, int idx, TYPE* elem)     \
+    {                                                                                                       \
+        if(idx < 0 || idx >= ctx->length)                                                                   \
+        {                                                                                                   \
+            return OUT_OF_BOUNDS;                                                                           \
+        }                                                                                                   \
+                                                                                                            \
+        *elem = ctx->array[idx];                                                                            \
+        vector_move_left_##SUFFIX(ctx, idx);                                                                \
+        ctx->length--;                                                                                      \
+        return OK;                                                                                          \
+    }                                                                                                       \
 
 
 #define VECTOR_INSERT(TYPE, SUFFIX)                                                                     \
@@ -140,7 +163,9 @@ enum vector_status {
     VECTOR_CHECK_BOUNDS(TYPE, SUFFIX)                                    \
     VECTOR_GROW(TYPE, SUFFIX)                                            \
     VECTOR_MOVE_RIGHT(TYPE, SUFFIX)                                      \
+    VECTOR_MOVE_LEFT(TYPE, SUFFIX)                                       \
     VECTOR_PUSH(TYPE, SUFFIX)                                            \
     VECTOR_INSERT(TYPE, SUFFIX)                                          \
     VECTOR_POP(TYPE, SUFFIX)                                             \
+    VECTOR_REMOVE(TYPE, SUFFIX)                                          \
     VECTOR_ASSERT(TYPE, SUFFIX)
