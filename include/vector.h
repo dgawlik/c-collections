@@ -8,7 +8,6 @@ enum vector_status {
     OUT_OF_BOUNDS
 };
 
-#define VECTOR_NORETURN __attribute__ ((noreturn))
 
 #define VECTOR_ASSERT(TYPE, SUFFIX)                                                 \
     int is_vector_equal(struct vector_context_##SUFFIX* ctx, int va_count, ...)     \
@@ -71,7 +70,7 @@ enum vector_status {
         ctx->array = newArray;                                                  \
         ctx->capacity *= 2;                                                     \
                                                                                 \
-    };                                                                          \   
+    };                                                                          \
 
 #define VECTOR_MOVE_RIGHT(TYPE, SUFFIX)                                         \
     void vector_move_right_##SUFFIX(struct vector_context_##SUFFIX* ctx, int idx)        \
@@ -83,8 +82,8 @@ enum vector_status {
     }                                                                           \
 
 
-#define VECTOR_ADD(TYPE, SUFFIX)                                                 \
-    void vector_add_##SUFFIX(struct vector_context_##SUFFIX* ctx, TYPE elem)     \
+#define VECTOR_PUSH(TYPE, SUFFIX)                                                \
+    void vector_push_##SUFFIX(struct vector_context_##SUFFIX* ctx, TYPE elem)    \
     {                                                                            \
         if(ctx->length == ctx->capacity)                                         \
         {                                                                        \
@@ -126,6 +125,6 @@ enum vector_status {
     VECTOR_CHECK_BOUNDS(TYPE, SUFFIX)                                    \
     VECTOR_GROW(TYPE, SUFFIX)                                            \
     VECTOR_MOVE_RIGHT(TYPE, SUFFIX)                                      \
-    VECTOR_ADD(TYPE, SUFFIX)                                             \
+    VECTOR_PUSH(TYPE, SUFFIX)                                            \
     VECTOR_INSERT(TYPE, SUFFIX)                                          \
     VECTOR_ASSERT(TYPE, SUFFIX)
