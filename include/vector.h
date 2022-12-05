@@ -6,7 +6,8 @@
 enum vector_status {
     OK,
     OUT_OF_BOUNDS,
-    EMPTY
+    EMPTY,
+    NOT_FOUND
 };
 
 
@@ -47,7 +48,12 @@ enum vector_status {
         return vector_init1_##SUFFIX(10);                                \
     };                                                                   \
 
-   
+
+#define VECTOR_DEFAULT_EQUALS(TYPE, SUFFIX)                             \
+    int vector_equals_##SUFFIX(TYPE lhs, TYPE rhs)                      \
+    {                                                                   \
+        return lhs == rhs;                                              \
+    }                                                                   \
 
 
 #define VECTOR_DESTROY(TYPE, SUFFIX)                                      \
@@ -153,11 +159,38 @@ enum vector_status {
     }                                                                                                   \
 
 
-
+#define VECTOR_INDEX(TYPE, SUFFIX)                                                                          \
+                                                                                                                                               \
+    enum vector_status vector_index_of4_##SUFFIX(struct vector_context_##SUFFIX* ctx, TYPE elem, int* idx, int (*equals)(TYPE lhs, TYPE rhs))  \
+    {                                                                                                                                          \
+        if(equals == NULL)                                                                                                                     \
+        {                                                                                                                                      \
+            equals = &vector_equals_##SUFFIX;                                                                                                  \
+        }                                                                                                                                      \
+                                                                                                                                               \
+        for(int i=0;i<ctx->length;i++)                                                                                                         \
+        {                                                                                                                                      \
+            if((*equals)(ctx->array[i], elem))                                                                                                 \
+            {                                                                                                                                  \
+                *idx = i;                                                                                                                      \
+                return OK;                                                                                                                     \
+            }                                                                                                                                  \
+        }                                                                                                                                      \
+                                                                                                                                               \
+        return NOT_FOUND;                                                                                                                      \
+    };                                                                                                                                         \
+                                                                                                                                               \
+    enum vector_status vector_index_of3_##SUFFIX(struct vector_context_##SUFFIX* ctx, TYPE elem, int* idx)  \
+    {                                                                                                       \
+        return vector_index_of4_##SUFFIX(ctx, elem, idx, NULL);                                             \
+    };                                                                                                      \
+                                                                                                            \
+  
 
 
 #define VECTOR_DEFINE_ALL(TYPE, SUFFIX)                                  \
     VECTOR_CONTEXT(TYPE, SUFFIX)                                         \
+    VECTOR_DEFAULT_EQUALS(TYPE, SUFFIX)                                  \
     VECTOR_INIT(TYPE, SUFFIX)                                            \
     VECTOR_DESTROY(TYPE, SUFFIX)                                         \
     VECTOR_CHECK_BOUNDS(TYPE, SUFFIX)                                    \
@@ -168,4 +201,5 @@ enum vector_status {
     VECTOR_INSERT(TYPE, SUFFIX)                                          \
     VECTOR_POP(TYPE, SUFFIX)                                             \
     VECTOR_REMOVE(TYPE, SUFFIX)                                          \
+    VECTOR_INDEX(TYPE, SUFFIX)                                           \
     VECTOR_ASSERT(TYPE, SUFFIX)

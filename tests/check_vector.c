@@ -106,6 +106,29 @@ START_TEST(test_remove)
 }
 END_TEST
 
+START_TEST(test_index_of)
+{
+    struct vector_context_int ctx = vector_init1_int(2);
+    vector_push_int(&ctx, 1);
+    vector_push_int(&ctx, 2);
+    vector_push_int(&ctx, 3);
+
+
+    int idx1;
+    vector_index_of3_int(&ctx, 2, &idx1);
+    ck_assert_int_eq(idx1, 1);
+
+    int idx2;
+    vector_index_of3_int(&ctx, 3, &idx2);
+    ck_assert_int_eq(idx2, 2);
+
+    int idx3;
+    ck_assert(vector_index_of3_int(&ctx, 5, &idx3) == NOT_FOUND);
+
+    vector_destroy_int(&ctx);
+}
+END_TEST
+
 
 #define TEST_ADD(label, var, test)      \
     TCase* var = tcase_create(label);   \
@@ -124,6 +147,7 @@ Suite * tests(void)
     TEST_ADD("Insert", tc_insert, test_insert);
     TEST_ADD("Pop", tc_pop, test_pop);
     TEST_ADD("Remove", tc_remove, test_remove);
+    TEST_ADD("IndexOf", tc_index_of, test_index_of);
     
     return s;
 }
