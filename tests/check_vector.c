@@ -56,32 +56,50 @@ START_TEST(test_insert)
 }
 END_TEST
 
+START_TEST(test_pop)
+{
+    struct vector_context_int ctx = vector_init1_int(2);
+    vector_push_int(&ctx, 1);
+    vector_insert_int(&ctx, 2, 0);
+    vector_insert_int(&ctx, 3, 0);
+
+    int pop1;
+    vector_pop_int(&ctx, &pop1);
+    ck_assert_int_eq(pop1, 1);
+
+    int pop2;
+    vector_pop_int(&ctx, &pop2);
+    ck_assert_int_eq(pop2, 2);
+
+     int pop3;
+    vector_pop_int(&ctx, &pop3);
+    ck_assert_int_eq(pop3, 3);
+
+    int pop4;
+    ck_assert(vector_pop_int(&ctx, &pop4) == EMPTY);
+
+    vector_destroy_int(&ctx);
+}
+END_TEST
+
+
+#define TEST_ADD(label, var, test)      \
+    TCase* var = tcase_create(label);   \
+    tcase_add_test(var, test);          \
+    suite_add_tcase(s, var);
+
+
 Suite * tests(void)
 {
-    Suite *s;
-    TCase *tc_core;
-    TCase *tc_bounds;
-    TCase *tc_add;
-    TCase *tc_grow;
+    Suite *s =  suite_create("vector");
 
-    s = suite_create("vector");
+    TEST_ADD("Core", tc_core, test_allocation);
+    TEST_ADD("Bounds", tc_bounds, test_check_bounds);
+    TEST_ADD("Push", tc_push, test_add);
+    TEST_ADD("Grow", tc_grow, test_grow);
+    TEST_ADD("Insert", tc_insert, test_insert);
+    TEST_ADD("Pop", tc_pop, test_pop);
     
-    tc_core = tcase_create("Core");
-    tcase_add_test(tc_core, test_allocation);
-    suite_add_tcase(s, tc_core);
-
-    tc_bounds = tcase_create("Bounds");
-    tcase_add_test(tc_bounds, test_check_bounds);
-    suite_add_tcase(s, tc_bounds);
-
-    tc_add = tcase_create("Add");
-    tcase_add_test(tc_add, test_add);
-    suite_add_tcase(s, tc_add);
-
-    tc_grow = tcase_create("Grow");
-    tcase_add_test(tc_grow, test_add);
-    suite_add_tcase(s, tc_grow);
-
     return s;
 }
 

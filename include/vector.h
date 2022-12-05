@@ -5,7 +5,8 @@
 
 enum vector_status {
     OK,
-    OUT_OF_BOUNDS
+    OUT_OF_BOUNDS,
+    EMPTY
 };
 
 
@@ -94,6 +95,20 @@ enum vector_status {
         ctx->length++;                                                           \
     }
 
+#define VECTOR_POP(TYPE, SUFFIX)                                                              \
+    enum vector_status vector_pop_##SUFFIX(struct vector_context_##SUFFIX* ctx, TYPE* elem)   \
+    {                                                                                         \
+        if(ctx->length == 0)                                                                  \
+        {                                                                                     \
+            return EMPTY;                                                                     \
+        }                                                                                     \
+                                                                                              \
+        *elem = ctx->array[ctx->length-1];                                                    \
+        ctx->length--;                                                                        \
+        return OK;                                                                            \
+    }
+
+
 #define VECTOR_INSERT(TYPE, SUFFIX)                                                                     \
     enum vector_status vector_insert_##SUFFIX(struct vector_context_##SUFFIX* ctx, TYPE elem, int idx)  \
     {                                                                                                   \
@@ -127,4 +142,5 @@ enum vector_status {
     VECTOR_MOVE_RIGHT(TYPE, SUFFIX)                                      \
     VECTOR_PUSH(TYPE, SUFFIX)                                            \
     VECTOR_INSERT(TYPE, SUFFIX)                                          \
+    VECTOR_POP(TYPE, SUFFIX)                                             \
     VECTOR_ASSERT(TYPE, SUFFIX)
