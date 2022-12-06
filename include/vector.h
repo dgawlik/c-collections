@@ -203,12 +203,24 @@ enum vector_status {
     {                                                                                                                   \
         for(int i=0;i<ctx->length;i++)                                                                                  \
         {                                                                                                               \
-            acc = (*reduce_op)(acc, ctx->array[i]);                                                                        \
+            acc = (*reduce_op)(acc, ctx->array[i]);                                                                     \
         }                                                                                                               \
                                                                                                                         \
         return acc;                                                                                                     \
     }                                                                                                                   \
 
+#define VECTOR_FILTER(TYPE, SUFFIX)                                                             \
+    void vector_filter_##SUFFIX(struct vector_context_##SUFFIX* ctx, int (*pred)(TYPE elem))    \
+    {                                                                                           \
+        for(int i=0;i<ctx->length;i++)                                                          \
+        {                                                                                       \
+            if(!(*pred)(ctx->array[i]))                                                         \
+            {                                                                                   \
+                TYPE elem;                                                                      \
+                vector_remove_##SUFFIX(ctx, i, &elem);                                          \
+            }                                                                                   \
+        }                                                                                       \
+    }                                                                                           \
 
 
 #define VECTOR_DEFINE_ALL(TYPE, SUFFIX)                                  \
@@ -228,4 +240,5 @@ enum vector_status {
     VECTOR_POP_FIRST(TYPE, SUFFIX)                                       \
     VECTOR_INDEX(TYPE, SUFFIX)                                           \
     VECTOR_REDUCE(TYPE, SUFFIX)                                          \
+    VECTOR_FILTER(TYPE, SUFFIX)                                          \
     VECTOR_ASSERT(TYPE, SUFFIX)

@@ -179,7 +179,7 @@ START_TEST(test_index_of_custom_equals)
 }
 END_TEST
 
-struct complex sum(struct complex lhs, struct complex rhs)
+struct complex sum_op(struct complex lhs, struct complex rhs)
 {
     struct complex s = {
         .first = lhs.first + rhs.first,
@@ -219,15 +219,34 @@ START_TEST(test_reduce)
         .second = 0.0
     };
 
-    struct complex sum = vector_reduce_complex(&ctx, zero, &sum);
+    struct complex sum = vector_reduce_complex(&ctx, zero, &sum_op);
 
     ck_assert_int_eq(sum.first, 5);
     ck_assert_int_eq(sum.second, 5);
 
-    vector_destroy_person(&ctx);
+    vector_destroy_complex(&ctx);
 }
 END_TEST
 
+int pred(int elem)
+{
+    return elem % 2 == 0;
+};
+
+START_TEST(test_filter)
+{
+    struct vector_context_int ctx = vector_init0_int();
+
+    vector_push_last_int(&ctx, 1);
+    vector_push_last_int(&ctx, 2);
+    vector_push_last_int(&ctx, 3);
+    vector_push_last_int(&ctx, 4);
+
+    vector_filter_int(&ctx, &pred);
+
+    ck_assert(is_vector_equal_int(&ctx, 2, 2, 4));
+}
+END_TEST
 
 #define TEST_ADD(label, var, test)      \
     TCase* var = tcase_create(label);   \
@@ -247,7 +266,10 @@ Suite * tests(void)
     TEST_ADD("Pop", tc_pop, test_pop);
     TEST_ADD("Remove", tc_remove, test_remove);
     TEST_ADD("IndexOf", tc_index_of, test_index_of);
-    
+    TEST_ADD("IndexOfStruct", tc_struct_index_of, test_index_of_custom_equals);
+    TEST_ADD("Reduce", tc_reduce, test_reduce);
+    TEST_ADD("Filter", tc_filter, test_filter);
+
     return s;
 }
 
