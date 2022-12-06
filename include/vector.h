@@ -231,6 +231,23 @@ enum vector_status {
         }                                                                                       \
     }                                                                                           \
 
+#define VECTOR_CLONE(TYPE, SUFFIX)                                                              \
+    struct vector_context_##SUFFIX vector_clone_##SUFFIX(struct vector_context_##SUFFIX* ctx)   \
+    {                                                                                           \
+        struct vector_context_##SUFFIX newCtx = {                                               \
+            .array = (TYPE *)malloc(sizeof(TYPE) * ctx->capacity),                              \
+            .capacity = ctx->capacity,                                                          \
+            .length = ctx->length                                                               \
+        };                                                                                      \
+                                                                                                \
+        for(int i=0;i<ctx->length;i++)                                                          \
+        {                                                                                       \
+            newCtx.array[i] = ctx->array[i];                                                    \
+        }                                                                                       \
+                                                                                                \
+        return newCtx;                                                                          \
+    }                                                                                           \
+
 
 #define VECTOR_DEFINE_ALL(TYPE, SUFFIX)                                  \
     VECTOR_CONTEXT(TYPE, SUFFIX)                                         \
@@ -251,4 +268,5 @@ enum vector_status {
     VECTOR_REDUCE(TYPE, SUFFIX)                                          \
     VECTOR_FILTER(TYPE, SUFFIX)                                          \
     VECTOR_MAP(TYPE, SUFFIX)                                             \
+    VECTOR_CLONE(TYPE, SUFFIX)                                           \
     VECTOR_ASSERT(TYPE, SUFFIX)

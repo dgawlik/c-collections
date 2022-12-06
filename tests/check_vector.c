@@ -267,6 +267,20 @@ START_TEST(test_map)
 }
 END_TEST
 
+START_TEST(test_clone)
+{
+    struct vector_context_int ctx = vector_init0_int();
+
+    vector_push_last_int(&ctx, 1);
+    vector_push_last_int(&ctx, 2);
+    vector_push_last_int(&ctx, 3);
+
+    struct vector_context_int ctx2 = vector_clone_int(&ctx);
+    ck_assert(is_vector_equal_int(&ctx, 3, 1, 2, 3));
+    ck_assert(ctx.array != ctx2.array);
+}
+END_TEST
+
 
 #define TEST_ADD(label, var, test)      \
     TCase* var = tcase_create(label);   \
