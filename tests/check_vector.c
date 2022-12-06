@@ -290,7 +290,7 @@ START_TEST(test_foreach)
     vector_push_last_int(&ctx, 3);
 
     int sum=0;
-    FOREACH(int, ctx, it)
+    FOREACH(ctx, int,  it)
     {
         sum += it;
     }

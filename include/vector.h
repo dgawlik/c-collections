@@ -271,4 +271,4 @@ enum vector_status {
     VECTOR_CLONE(TYPE, SUFFIX)                                           \
     VECTOR_ASSERT(TYPE, SUFFIX)                                          \
 
-#define FOREACH(TYPE, CTX, IT) int _x=0; TYPE IT=CTX.array[_x];  for(;_x<CTX.length;IT=CTX.array[++_x])
+#define FOREACH(CTX, TYPE, IT) int _x=0; TYPE IT=CTX.array[_x];  for(;_x<CTX.length;IT=CTX.array[++_x])
