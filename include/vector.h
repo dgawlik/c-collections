@@ -12,12 +12,12 @@ enum vector_status {
 
 
 #define VECTOR_ASSERT(TYPE, SUFFIX)                                                 \
-    int is_vector_equal(struct vector_context_##SUFFIX* ctx, int va_count, ...)     \
+    int is_vector_equal_##SUFFIX(struct vector_context_##SUFFIX* ctx, int va_count, ...)     \
     {                                                                               \
         va_list ap;                                                                 \
         va_start(ap, va_count);                                                     \
         for(int i=0; i<va_count; i++)                                               \
-            if(ctx->array[i] != va_arg(ap, TYPE))                                   \
+            if(!vector_equals_##SUFFIX(ctx->array[i],va_arg(ap, TYPE)))             \
                 return 0;                                                           \
         va_end(ap);                                                                 \
         return 1;                                                                   \
@@ -52,7 +52,7 @@ enum vector_status {
 #define VECTOR_DEFAULT_EQUALS(TYPE, SUFFIX)                             \
     int vector_equals_##SUFFIX(TYPE lhs, TYPE rhs)                      \
     {                                                                   \
-        return lhs == rhs;                                              \
+        return memcmp(&lhs, &rhs, sizeof(TYPE)) == 0;                   \
     }                                                                   \
 
 

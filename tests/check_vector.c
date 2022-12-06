@@ -1,9 +1,17 @@
 #include <stdlib.h>
 #include <check.h>
+#include <string.h>
 #include "../include/vector.h"
  
 
 VECTOR_DEFINE_ALL(int, int);
+
+struct person {
+    char* first_name;
+    char* last_name;
+};
+
+VECTOR_DEFINE_ALL(struct person, person);
 
 START_TEST(test_allocation)
 {
@@ -28,7 +36,7 @@ START_TEST(test_add)
     vector_push_int(&ctx, 1);
     vector_push_int(&ctx, 2);
     vector_push_int(&ctx, 3);
-    ck_assert(is_vector_equal(&ctx, 3, 1, 2 ,3));
+    ck_assert(is_vector_equal_int(&ctx, 3, 1, 2 ,3));
     vector_destroy_int(&ctx);
 }
 END_TEST
@@ -39,7 +47,7 @@ START_TEST(test_grow)
     vector_push_int(&ctx, 1);
     vector_push_int(&ctx, 2);
     vector_push_int(&ctx, 3);
-    ck_assert(is_vector_equal(&ctx, 3, 1, 2 ,3));
+    ck_assert(is_vector_equal_int(&ctx, 3, 1, 2 ,3));
     vector_destroy_int(&ctx);
 }
 END_TEST
@@ -50,7 +58,7 @@ START_TEST(test_insert)
     vector_push_int(&ctx, 1);
     vector_insert_int(&ctx, 2, 0);
     vector_insert_int(&ctx, 3, 0);
-    ck_assert(is_vector_equal(&ctx, 3, 3, 2, 1));
+    ck_assert(is_vector_equal_int(&ctx, 3, 3, 2, 1));
     ck_assert(vector_insert_int(&ctx, 4, 5) == OUT_OF_BOUNDS);
     vector_destroy_int(&ctx);
 }
@@ -126,6 +134,41 @@ START_TEST(test_index_of)
     ck_assert(vector_index_of3_int(&ctx, 5, &idx3) == NOT_FOUND);
 
     vector_destroy_int(&ctx);
+}
+END_TEST
+
+int custom_equals(struct person lhs, struct person rhs)
+{
+    return strcmp(lhs.first_name, rhs.first_name) == 0;
+}
+
+START_TEST(test_index_of_custom_equals)
+{
+    struct vector_context_person ctx = vector_init1_person(2);
+
+    struct person p1 = {
+        .first_name = "Dominik",
+        .last_name = "Gawlik"
+    };
+    vector_push_person(&ctx, p1);
+
+    struct person p2 = {
+        .first_name = "Damian",
+        .last_name = "Gawlik"
+    };
+
+    vector_push_person(&ctx, p2);
+
+
+    int idx1;
+    vector_index_of4_person(&ctx, p2, &idx1, &custom_equals);
+    ck_assert_int_eq(idx1, 1);
+
+    int idx2;
+    vector_index_of4_person(&ctx, p1, &idx2, &custom_equals);
+    ck_assert_int_eq(idx2, 0);
+
+    vector_destroy_person(&ctx);
 }
 END_TEST
 
