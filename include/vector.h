@@ -98,30 +98,42 @@ enum vector_status {
     }                                                                               \
 
 
-#define VECTOR_PUSH(TYPE, SUFFIX)                                                \
-    void vector_push_##SUFFIX(struct vector_context_##SUFFIX* ctx, TYPE elem)    \
-    {                                                                            \
-        if(ctx->length == ctx->capacity)                                         \
-        {                                                                        \
-            vector_grow_##SUFFIX(ctx);                                           \
-        }                                                                        \
-                                                                                 \
-        ctx->array[ctx->length] = elem;                                          \
-        ctx->length++;                                                           \
+#define VECTOR_PUSH_LAST(TYPE, SUFFIX)                                                \
+    void vector_push_last_##SUFFIX(struct vector_context_##SUFFIX* ctx, TYPE elem)    \
+    {                                                                                 \
+        if(ctx->length == ctx->capacity)                                              \
+        {                                                                             \
+            vector_grow_##SUFFIX(ctx);                                                \
+        }                                                                             \
+                                                                                      \
+        ctx->array[ctx->length] = elem;                                               \
+        ctx->length++;                                                                \
     }
 
-#define VECTOR_POP(TYPE, SUFFIX)                                                              \
-    enum vector_status vector_pop_##SUFFIX(struct vector_context_##SUFFIX* ctx, TYPE* elem)   \
-    {                                                                                         \
-        if(ctx->length == 0)                                                                  \
-        {                                                                                     \
-            return EMPTY;                                                                     \
-        }                                                                                     \
-                                                                                              \
-        *elem = ctx->array[ctx->length-1];                                                    \
-        ctx->length--;                                                                        \
-        return OK;                                                                            \
+#define VECTOR_PUSH_FIRST(TYPE, SUFFIX)                                               \
+    void vector_push_first_##SUFFIX(struct vector_context_##SUFFIX* ctx, TYPE elem)   \
+    {                                                                                 \
+        vector_insert_##SUFFIX(ctx, elem, 0);                                         \
+    }                                                                                 \
+
+#define VECTOR_POP_LAST(TYPE, SUFFIX)                                                              \
+    enum vector_status vector_pop_last_##SUFFIX(struct vector_context_##SUFFIX* ctx, TYPE* elem)   \
+    {                                                                                              \
+        if(ctx->length == 0)                                                                       \
+        {                                                                                          \
+            return EMPTY;                                                                          \
+        }                                                                                          \
+                                                                                                   \
+        *elem = ctx->array[ctx->length-1];                                                         \
+        ctx->length--;                                                                             \
+        return OK;                                                                                 \
     }
+
+#define VECTOR_POP_FIRST(TYPE, SUFFIX)                                                              \
+    enum vector_status vector_pop_first_##SUFFIX(struct vector_context_##SUFFIX* ctx, TYPE* elem)   \
+    {                                                                                               \
+        return vector_remove_##SUFFIX(ctx, 0, elem);                                                \
+    }                                                                                               \
 
 #define VECTOR_REMOVE(TYPE, SUFFIX)                                                                         \
     enum vector_status vector_remove_##SUFFIX(struct vector_context_##SUFFIX* ctx, int idx, TYPE* elem)     \
@@ -185,7 +197,18 @@ enum vector_status {
         return vector_index_of4_##SUFFIX(ctx, elem, idx, NULL);                                             \
     };                                                                                                      \
                                                                                                             \
-  
+
+#define VECTOR_REDUCE(TYPE, SUFFIX)                                                                                     \
+    TYPE vector_reduce_##SUFFIX(struct vector_context_##SUFFIX* ctx, TYPE acc, TYPE (*reduce_op)(TYPE lhs, TYPE rhs))   \
+    {                                                                                                                   \
+        for(int i=0;i<ctx->length;i++)                                                                                  \
+        {                                                                                                               \
+            acc = (*reduce_op)(acc, ctx->array[i]);                                                                        \
+        }                                                                                                               \
+                                                                                                                        \
+        return acc;                                                                                                     \
+    }                                                                                                                   \
+
 
 
 #define VECTOR_DEFINE_ALL(TYPE, SUFFIX)                                  \
@@ -197,9 +220,12 @@ enum vector_status {
     VECTOR_GROW(TYPE, SUFFIX)                                            \
     VECTOR_MOVE_RIGHT(TYPE, SUFFIX)                                      \
     VECTOR_MOVE_LEFT(TYPE, SUFFIX)                                       \
-    VECTOR_PUSH(TYPE, SUFFIX)                                            \
-    VECTOR_INSERT(TYPE, SUFFIX)                                          \
-    VECTOR_POP(TYPE, SUFFIX)                                             \
     VECTOR_REMOVE(TYPE, SUFFIX)                                          \
+    VECTOR_INSERT(TYPE, SUFFIX)                                          \
+    VECTOR_PUSH_LAST(TYPE, SUFFIX)                                       \
+    VECTOR_PUSH_FIRST(TYPE, SUFFIX)                                      \
+    VECTOR_POP_LAST(TYPE, SUFFIX)                                        \
+    VECTOR_POP_FIRST(TYPE, SUFFIX)                                       \
     VECTOR_INDEX(TYPE, SUFFIX)                                           \
+    VECTOR_REDUCE(TYPE, SUFFIX)                                          \
     VECTOR_ASSERT(TYPE, SUFFIX)

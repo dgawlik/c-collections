@@ -13,6 +13,13 @@ struct person {
 
 VECTOR_DEFINE_ALL(struct person, person);
 
+struct complex {
+    double first;
+    double second;
+};
+
+VECTOR_DEFINE_ALL(struct complex, complex);
+
 START_TEST(test_allocation)
 {
     struct vector_context_int ctx = vector_init1_int(10);
@@ -33,9 +40,9 @@ END_TEST
 START_TEST(test_add)
 {
     struct vector_context_int ctx = vector_init1_int(10);
-    vector_push_int(&ctx, 1);
-    vector_push_int(&ctx, 2);
-    vector_push_int(&ctx, 3);
+    vector_push_last_int(&ctx, 1);
+    vector_push_last_int(&ctx, 2);
+    vector_push_last_int(&ctx, 3);
     ck_assert(is_vector_equal_int(&ctx, 3, 1, 2 ,3));
     vector_destroy_int(&ctx);
 }
@@ -44,9 +51,9 @@ END_TEST
 START_TEST(test_grow)
 {
     struct vector_context_int ctx = vector_init1_int(2);
-    vector_push_int(&ctx, 1);
-    vector_push_int(&ctx, 2);
-    vector_push_int(&ctx, 3);
+    vector_push_last_int(&ctx, 1);
+    vector_push_last_int(&ctx, 2);
+    vector_push_last_int(&ctx, 3);
     ck_assert(is_vector_equal_int(&ctx, 3, 1, 2 ,3));
     vector_destroy_int(&ctx);
 }
@@ -55,7 +62,7 @@ END_TEST
 START_TEST(test_insert)
 {
     struct vector_context_int ctx = vector_init1_int(2);
-    vector_push_int(&ctx, 1);
+    vector_push_last_int(&ctx, 1);
     vector_insert_int(&ctx, 2, 0);
     vector_insert_int(&ctx, 3, 0);
     ck_assert(is_vector_equal_int(&ctx, 3, 3, 2, 1));
@@ -67,24 +74,24 @@ END_TEST
 START_TEST(test_pop)
 {
     struct vector_context_int ctx = vector_init1_int(2);
-    vector_push_int(&ctx, 1);
+    vector_push_last_int(&ctx, 1);
     vector_insert_int(&ctx, 2, 0);
     vector_insert_int(&ctx, 3, 0);
 
     int pop1;
-    vector_pop_int(&ctx, &pop1);
+    vector_pop_last_int(&ctx, &pop1);
     ck_assert_int_eq(pop1, 1);
 
     int pop2;
-    vector_pop_int(&ctx, &pop2);
+    vector_pop_last_int(&ctx, &pop2);
     ck_assert_int_eq(pop2, 2);
 
      int pop3;
-    vector_pop_int(&ctx, &pop3);
+    vector_pop_last_int(&ctx, &pop3);
     ck_assert_int_eq(pop3, 3);
 
     int pop4;
-    ck_assert(vector_pop_int(&ctx, &pop4) == EMPTY);
+    ck_assert(vector_pop_last_int(&ctx, &pop4) == EMPTY);
 
     vector_destroy_int(&ctx);
 }
@@ -93,9 +100,9 @@ END_TEST
 START_TEST(test_remove)
 {
     struct vector_context_int ctx = vector_init1_int(2);
-    vector_push_int(&ctx, 1);
-    vector_push_int(&ctx, 2);
-    vector_push_int(&ctx, 3);
+    vector_push_last_int(&ctx, 1);
+    vector_push_last_int(&ctx, 2);
+    vector_push_last_int(&ctx, 3);
 
 
     int rm1;
@@ -117,9 +124,9 @@ END_TEST
 START_TEST(test_index_of)
 {
     struct vector_context_int ctx = vector_init1_int(2);
-    vector_push_int(&ctx, 1);
-    vector_push_int(&ctx, 2);
-    vector_push_int(&ctx, 3);
+    vector_push_last_int(&ctx, 1);
+    vector_push_last_int(&ctx, 2);
+    vector_push_last_int(&ctx, 3);
 
 
     int idx1;
@@ -150,14 +157,14 @@ START_TEST(test_index_of_custom_equals)
         .first_name = "Dominik",
         .last_name = "Gawlik"
     };
-    vector_push_person(&ctx, p1);
+    vector_push_last_person(&ctx, p1);
 
     struct person p2 = {
         .first_name = "Damian",
         .last_name = "Gawlik"
     };
 
-    vector_push_person(&ctx, p2);
+    vector_push_last_person(&ctx, p2);
 
 
     int idx1;
@@ -167,6 +174,55 @@ START_TEST(test_index_of_custom_equals)
     int idx2;
     vector_index_of4_person(&ctx, p1, &idx2, &custom_equals);
     ck_assert_int_eq(idx2, 0);
+
+    vector_destroy_person(&ctx);
+}
+END_TEST
+
+struct complex sum(struct complex lhs, struct complex rhs)
+{
+    struct complex s = {
+        .first = lhs.first + rhs.first,
+        .second = lhs.second + rhs.second
+    };
+
+    return s;
+}
+
+START_TEST(test_reduce)
+{
+    struct vector_context_complex ctx = vector_init1_complex(2);
+
+    struct complex c1 = {
+        .first = 1.0,
+        .second = 2.0
+    };
+
+    vector_push_last_complex(&ctx, c1);
+
+    struct complex c2 = {
+        .first = 2,
+        .second = 1
+    };
+
+    vector_push_last_complex(&ctx, c2);
+
+    struct complex c3 = {
+        .first = 2,
+        .second = 2
+    };
+
+    vector_push_last_complex(&ctx, c3);
+
+    struct complex zero = {
+        .first = 0.0,
+        .second = 0.0
+    };
+
+    struct complex sum = vector_reduce_complex(&ctx, zero, &sum);
+
+    ck_assert_int_eq(sum.first, 5);
+    ck_assert_int_eq(sum.second, 5);
 
     vector_destroy_person(&ctx);
 }
