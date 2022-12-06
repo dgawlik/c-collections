@@ -321,6 +321,7 @@ Suite * tests(void)
     TEST_ADD("Reduce", tc_reduce, test_reduce);
     TEST_ADD("Filter", tc_filter, test_filter);
     TEST_ADD("Map", tc_map, test_map);
+    TEST_ADD("Clone", tc_clone, test_clone);
     TEST_ADD("Foreach", tc_foreach, test_foreach);
 
     return s;
