@@ -65,7 +65,7 @@ enum vector_status {
 #define VECTOR_CHECK_BOUNDS(TYPE, SUFFIX)                                       \
     int is_inside_bounds_##SUFFIX(struct vector_context_##SUFFIX* ctx, int idx) \
     {                                                                           \
-        return idx >= 0 && idx < ctx->length;                                   \
+        return idx >= 0 && idx <= ctx->length;                                   \
     };                                                                          \
 
 #define VECTOR_GROW(TYPE, SUFFIX)                                               \

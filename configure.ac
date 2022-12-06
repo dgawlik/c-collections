@@ -3,5 +3,5 @@ AM_INIT_AUTOMAKE([foreign -Wall -Werror])
 AC_PROG_CC
 PKG_CHECK_MODULES([CHECK], [check >= 0.9.6])
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_FILES([Makefile tests/Makefile])
+AC_CONFIG_FILES([Makefile tests/Makefile examples/Makefile])
 AC_OUTPUT
