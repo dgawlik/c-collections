@@ -248,6 +248,26 @@ START_TEST(test_filter)
 }
 END_TEST
 
+int multiply_by_two(int elem)
+{
+    return elem * 2;
+};
+
+START_TEST(test_map)
+{
+    struct vector_context_int ctx = vector_init0_int();
+
+    vector_push_last_int(&ctx, 1);
+    vector_push_last_int(&ctx, 2);
+    vector_push_last_int(&ctx, 3);
+
+    vector_map_int(&ctx, &multiply_by_two);
+
+    ck_assert(is_vector_equal_int(&ctx, 3, 2, 4, 6));
+}
+END_TEST
+
+
 #define TEST_ADD(label, var, test)      \
     TCase* var = tcase_create(label);   \
     tcase_add_test(var, test);          \
@@ -269,6 +289,7 @@ Suite * tests(void)
     TEST_ADD("IndexOfStruct", tc_struct_index_of, test_index_of_custom_equals);
     TEST_ADD("Reduce", tc_reduce, test_reduce);
     TEST_ADD("Filter", tc_filter, test_filter);
+    TEST_ADD("Map", tc_map, test_map);
 
     return s;
 }

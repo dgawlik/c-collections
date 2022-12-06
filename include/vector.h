@@ -222,6 +222,15 @@ enum vector_status {
         }                                                                                       \
     }                                                                                           \
 
+#define VECTOR_MAP(TYPE, SUFFIX)                                                                \
+    void vector_map_##SUFFIX(struct vector_context_##SUFFIX* ctx, TYPE (*map_op)(TYPE elem))    \
+    {                                                                                           \
+        for(int i=0;i<ctx->length;i++)                                                          \
+        {                                                                                       \
+            ctx->array[i] = (*map_op)(ctx->array[i]);                                           \
+        }                                                                                       \
+    }                                                                                           \
+
 
 #define VECTOR_DEFINE_ALL(TYPE, SUFFIX)                                  \
     VECTOR_CONTEXT(TYPE, SUFFIX)                                         \
@@ -241,4 +250,5 @@ enum vector_status {
     VECTOR_INDEX(TYPE, SUFFIX)                                           \
     VECTOR_REDUCE(TYPE, SUFFIX)                                          \
     VECTOR_FILTER(TYPE, SUFFIX)                                          \
+    VECTOR_MAP(TYPE, SUFFIX)                                             \
     VECTOR_ASSERT(TYPE, SUFFIX)
