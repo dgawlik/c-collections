@@ -281,6 +281,23 @@ START_TEST(test_clone)
 }
 END_TEST
 
+START_TEST(test_foreach)
+{
+    struct vector_context_int ctx = vector_init0_int();
+
+    vector_push_last_int(&ctx, 1);
+    vector_push_last_int(&ctx, 2);
+    vector_push_last_int(&ctx, 3);
+
+    int sum=0;
+    FOREACH(int, ctx, it)
+    {
+        sum += it;
+    }
+
+    ck_assert(sum == 6);
+}
+
 
 #define TEST_ADD(label, var, test)      \
     TCase* var = tcase_create(label);   \
@@ -304,6 +321,7 @@ Suite * tests(void)
     TEST_ADD("Reduce", tc_reduce, test_reduce);
     TEST_ADD("Filter", tc_filter, test_filter);
     TEST_ADD("Map", tc_map, test_map);
+    TEST_ADD("Foreach", tc_foreach, test_foreach);
 
     return s;
 }

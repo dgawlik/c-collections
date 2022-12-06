@@ -269,4 +269,6 @@ enum vector_status {
     VECTOR_FILTER(TYPE, SUFFIX)                                          \
     VECTOR_MAP(TYPE, SUFFIX)                                             \
     VECTOR_CLONE(TYPE, SUFFIX)                                           \
-    VECTOR_ASSERT(TYPE, SUFFIX)
+    VECTOR_ASSERT(TYPE, SUFFIX)                                          \
+
+#define FOREACH(TYPE, CTX, IT) int i=0; TYPE IT=CTX.array[i];  for(;i<CTX.length;IT=CTX.array[++i])
