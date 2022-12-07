@@ -207,7 +207,7 @@ enum vector_status {
 #define VECTOR_FILTER(TYPE, SUFFIX)                                                             \
     void vector_filter_##SUFFIX(struct vector_context_##SUFFIX* ctx, int (*pred)(TYPE elem))    \
     {                                                                                           \
-        for(int i=0;i<ctx->length;i++)                                                          \
+        for(int i=ctx->length-1;i>=0;i--)                                                       \
         {                                                                                       \
             if(!(*pred)(ctx->array[i]))                                                         \
             {                                                                                   \
