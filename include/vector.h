@@ -61,12 +61,7 @@ enum vector_status {
     {                                                                     \
         free(ctx->array);                                                 \
     };                                                                    \
-
-#define VECTOR_CHECK_BOUNDS(TYPE, SUFFIX)                                       \
-    int is_inside_bounds_##SUFFIX(struct vector_context_##SUFFIX* ctx, int idx) \
-    {                                                                           \
-        return idx >= 0 && idx <= ctx->length;                                   \
-    };                                                                          \
+                                                                          \
 
 #define VECTOR_GROW(TYPE, SUFFIX)                                               \
     void vector_grow_##SUFFIX(struct vector_context_##SUFFIX* ctx)              \
@@ -79,14 +74,14 @@ enum vector_status {
                                                                                 \
     };                                                                          \
 
-#define VECTOR_MOVE_RIGHT(TYPE, SUFFIX)                                         \
-    void vector_move_right_##SUFFIX(struct vector_context_##SUFFIX* ctx, int idx)        \
-    {                                                                           \
-        for(int i=ctx->length-1;i>=idx;i--)                                     \
-        {                                                                       \
-            ctx->array[i+1] = ctx->array[i];                                    \
-        }                                                                       \
-    }                                                                           \
+#define VECTOR_MOVE_RIGHT(TYPE, SUFFIX)                                               \
+    void vector_move_right_##SUFFIX(struct vector_context_##SUFFIX* ctx, int idx)     \
+    {                                                                                 \
+        for(int i=ctx->length-1;i>=idx;i--)                                           \
+        {                                                                             \
+            ctx->array[i+1] = ctx->array[i];                                          \
+        }                                                                             \
+    }                                                                                 \
 
 #define VECTOR_MOVE_LEFT(TYPE, SUFFIX)                                              \
     void vector_move_left_##SUFFIX(struct vector_context_##SUFFIX* ctx, int idx)    \
@@ -153,7 +148,7 @@ enum vector_status {
 #define VECTOR_INSERT(TYPE, SUFFIX)                                                                     \
     enum vector_status vector_insert_##SUFFIX(struct vector_context_##SUFFIX* ctx, TYPE elem, int idx)  \
     {                                                                                                   \
-        if(!is_inside_bounds_##SUFFIX(ctx, idx))                                                        \
+        if(idx < 0 || idx > ctx->length)                                                                \
         {                                                                                               \
             return OUT_OF_BOUNDS;                                                                       \
         }                                                                                               \
@@ -248,13 +243,36 @@ enum vector_status {
         return newCtx;                                                                          \
     }                                                                                           \
 
+#define VECTOR_GET(TYPE, SUFFIX)                                                                     \
+    enum vector_status vector_get_##SUFFIX(struct vector_context_##SUFFIX* ctx, int idx, TYPE* elem) \
+    {                                                                                                \
+        if(idx < 0 || idx >= ctx->length)                                                            \
+        {                                                                                            \
+            return OUT_OF_BOUNDS;                                                                    \
+        }                                                                                            \
+                                                                                                     \
+        *elem = ctx->array[idx];                                                                     \
+        return OK;                                                                                   \
+    }                                                                                                \
+
+#define VECTOR_SET(TYPE, SUFFIX)                                                                     \
+    enum vector_status vector_set_##SUFFIX(struct vector_context_##SUFFIX* ctx, int idx, TYPE elem)  \
+    {                                                                                                \
+        if(idx < 0 || idx >= ctx->length)                                                            \
+        {                                                                                            \
+            return OUT_OF_BOUNDS;                                                                    \
+        }                                                                                            \
+                                                                                                     \
+        ctx->array[idx] = elem;                                                                      \
+        return OK;                                                                                   \
+    }  
+
 
 #define VECTOR_DEFINE_ALL(TYPE, SUFFIX)                                  \
     VECTOR_CONTEXT(TYPE, SUFFIX)                                         \
     VECTOR_DEFAULT_EQUALS(TYPE, SUFFIX)                                  \
     VECTOR_INIT(TYPE, SUFFIX)                                            \
     VECTOR_DESTROY(TYPE, SUFFIX)                                         \
-    VECTOR_CHECK_BOUNDS(TYPE, SUFFIX)                                    \
     VECTOR_GROW(TYPE, SUFFIX)                                            \
     VECTOR_MOVE_RIGHT(TYPE, SUFFIX)                                      \
     VECTOR_MOVE_LEFT(TYPE, SUFFIX)                                       \
@@ -269,6 +287,8 @@ enum vector_status {
     VECTOR_FILTER(TYPE, SUFFIX)                                          \
     VECTOR_MAP(TYPE, SUFFIX)                                             \
     VECTOR_CLONE(TYPE, SUFFIX)                                           \
+    VECTOR_GET(TYPE, SUFFIX)                                             \
+    VECTOR_SET(TYPE, SUFFIX)                                             \
     VECTOR_ASSERT(TYPE, SUFFIX)                                          \
 
 #define FOREACH(CTX, TYPE, IT) int _x=0; TYPE IT=CTX.array[_x];  for(;_x<CTX.length;IT=CTX.array[++_x])

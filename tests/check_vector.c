@@ -27,15 +27,6 @@ START_TEST(test_allocation)
     vector_destroy_int(&ctx);
 }
 END_TEST
- 
-START_TEST(test_check_bounds)
-{
-    struct vector_context_int ctx = vector_init1_int(10);
-    ck_assert(!is_inside_bounds_int(&ctx, 1));
-    ck_assert(!is_inside_bounds_int(&ctx, -1));
-    vector_destroy_int(&ctx);
-}
-END_TEST
 
 START_TEST(test_add)
 {
@@ -298,6 +289,28 @@ START_TEST(test_foreach)
     ck_assert(sum == 6);
 }
 
+START_TEST(test_get_set)
+{
+    struct vector_context_int ctx = vector_init0_int();
+
+    vector_push_last_int(&ctx, 1);
+    vector_push_last_int(&ctx, 2);
+
+    int get;
+    vector_get_int(&ctx, 0, &get);
+
+    ck_assert_int_eq(1, get);
+
+    vector_set_int(&ctx, 1, 4);
+
+    int get2;
+    vector_get_int(&ctx, 1, &get2);
+
+    ck_assert_int_eq(4, get2);
+
+    ck_assert(vector_get_int(&ctx, 2, &get2) == OUT_OF_BOUNDS);
+}
+END_TEST
 
 #define TEST_ADD(label, var, test)      \
     TCase* var = tcase_create(label);   \
@@ -310,7 +323,6 @@ Suite * tests(void)
     Suite *s =  suite_create("vector");
 
     TEST_ADD("Core", tc_core, test_allocation);
-    TEST_ADD("Bounds", tc_bounds, test_check_bounds);
     TEST_ADD("Push", tc_push, test_add);
     TEST_ADD("Grow", tc_grow, test_grow);
     TEST_ADD("Insert", tc_insert, test_insert);
@@ -323,6 +335,7 @@ Suite * tests(void)
     TEST_ADD("Map", tc_map, test_map);
     TEST_ADD("Clone", tc_clone, test_clone);
     TEST_ADD("Foreach", tc_foreach, test_foreach);
+    TEST_ADD("GetSet", tc_get_set, test_get_set);
 
     return s;
 }
