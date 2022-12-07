@@ -268,6 +268,38 @@ enum vector_status {
     }  
 
 
+char* string_concat(char* lhs, char* rhs)
+{
+    int len_lhs = strlen(lhs);
+    int len_rhs = strlen(rhs);
+
+    char* new_str = (char*) malloc((len_lhs+len_rhs+1)*sizeof(char));
+    strcpy(new_str, lhs); 
+    new_str = strcat(new_str, rhs); 
+
+    return new_str;
+}
+
+
+#define VECTOR_TO_STRING(TYPE, SUFFIX)                                                               \
+    char* vector_to_string_##SUFFIX(struct vector_context_##SUFFIX* ctx, char* (*fmt)(TYPE el))      \
+    {                                                                                                \
+        char* buf = "[";                                                                             \
+        int i=0;                                                                                     \
+        for(;i<ctx->length-1;i++)                                                                    \
+        {                                                                                            \
+            buf = string_concat(buf, (*fmt)(ctx->array[i]));                                         \
+            buf = string_concat(buf, ", ");                                                          \
+        }                                                                                            \
+        if(i<ctx->length)                                                                            \
+        {                                                                                            \
+            buf = string_concat(buf, (*fmt)(ctx->array[i]));                                         \
+        }                                                                                            \
+                                                                                                     \
+        return string_concat(buf, "]");                                                              \
+    }                                                                                                \
+
+
 #define VECTOR_DEFINE_ALL(TYPE, SUFFIX)                                  \
     VECTOR_CONTEXT(TYPE, SUFFIX)                                         \
     VECTOR_DEFAULT_EQUALS(TYPE, SUFFIX)                                  \
@@ -289,6 +321,7 @@ enum vector_status {
     VECTOR_CLONE(TYPE, SUFFIX)                                           \
     VECTOR_GET(TYPE, SUFFIX)                                             \
     VECTOR_SET(TYPE, SUFFIX)                                             \
+    VECTOR_TO_STRING(TYPE, SUFFIX)                                       \
     VECTOR_ASSERT(TYPE, SUFFIX)                                          \
 
 #define FOREACH(CTX, TYPE, IT) int _x=0; TYPE IT=CTX.array[_x];  for(;_x<CTX.length;IT=CTX.array[++_x])

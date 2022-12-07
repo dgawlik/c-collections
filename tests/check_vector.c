@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <check.h>
+#include <stdio.h>
 #include <string.h>
 #include "../include/vector.h"
  
@@ -312,6 +313,29 @@ START_TEST(test_get_set)
 }
 END_TEST
 
+char* fmt_op(int el)
+{
+    int length = snprintf( NULL, 0, "%d", el );
+    char* str = malloc( length + 1 );
+    snprintf( str, length + 1, "%d", el );
+    return str;
+}
+
+START_TEST(test_to_string)
+{
+    struct vector_context_int ctx = vector_init0_int();
+
+    vector_push_last_int(&ctx, 1);
+    vector_push_last_int(&ctx, 2);
+    vector_push_last_int(&ctx, 3);
+
+    char* repr = vector_to_string_int(&ctx, &fmt_op);
+
+    ck_assert_pstr_eq("[1, 2, 3]", repr);
+}
+END_TEST
+
+
 #define TEST_ADD(label, var, test)      \
     TCase* var = tcase_create(label);   \
     tcase_add_test(var, test);          \
@@ -336,6 +360,7 @@ Suite * tests(void)
     TEST_ADD("Clone", tc_clone, test_clone);
     TEST_ADD("Foreach", tc_foreach, test_foreach);
     TEST_ADD("GetSet", tc_get_set, test_get_set);
+    TEST_ADD("ToString", tc_to_string, test_to_string);
 
     return s;
 }
