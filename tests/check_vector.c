@@ -384,6 +384,7 @@ Suite * tests(void)
     TEST_ADD("Foreach", tc_foreach, test_foreach);
     TEST_ADD("GetSet", tc_get_set, test_get_set);
     TEST_ADD("ToString", tc_to_string, test_to_string);
+    TEST_ADD("Sort", tc_sort, test_sort);
 
     return s;
 }
