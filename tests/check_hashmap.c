@@ -43,6 +43,29 @@ START_TEST(test_put)
 }
 END_TEST
 
+START_TEST(test_get)
+{
+    struct hashmap_context_i ctx = hashmap_init3_i(hash_code, equals, 1);
+
+    hashmap_put_i(&ctx, 0, 1);
+    hashmap_put_i(&ctx, 1, 2);
+    hashmap_put_i(&ctx, 2, 3);
+
+    int value;
+    hashmap_get_i(&ctx, 0, &value);
+    ck_assert_int_eq(1, value);
+
+    hashmap_get_i(&ctx, 1, &value);
+    ck_assert_int_eq(2, value);
+
+    hashmap_get_i(&ctx, 2, &value);
+    ck_assert_int_eq(3, value);
+
+    ck_assert(hashmap_get_i(&ctx, 3, &value) == HASH_NOT_FOUND);
+
+}
+END_TEST
+
 
 #define TEST_ADD(label, var, test)      \
     TCase* var = tcase_create(label);   \

@@ -116,8 +116,34 @@ enum hash_status {
                                                                                                                                          \
     }                                                                                                                                    \
 
+#define HASHMAP_GET(KTYPE, VTYPE, SUFFIX)                                                                   \
+    enum hash_status hashmap_get_##SUFFIX(struct hashmap_context_##SUFFIX* ctx, KTYPE key, VTYPE* value)    \
+    {                                                                                                       \
+        int hash = ctx->hash_code(key);                                                                     \
+                                                                                                            \
+        if(ctx->buckets[hash] == NULL)                                                                      \
+        {                                                                                                   \
+            return HASH_NOT_FOUND;                                                                          \
+        }                                                                                                   \
+                                                                                                            \
+        struct hashmap_value_node_##SUFFIX* it = ctx->buckets[hash];                                        \
+        while(it != NULL)                                                                                   \
+        {                                                                                                   \
+            if(ctx->equals(key, it->key))                                                                   \
+            {                                                                                               \
+                *value = it->value;                                                                         \
+                return HASH_OK;                                                                             \
+            }                                                                                               \
+                                                                                                            \
+            it = it->next;                                                                                  \
+        }                                                                                                   \
+                                                                                                            \
+        return HASH_NOT_FOUND;                                                                              \
+    }                                                                                                       \
+
 
 #define HASHMAP_DEFINE_ALL(KTYPE, VTYPE, SUFFIX)        \
     HASHMAP_CONTEXT(KTYPE, VTYPE, SUFFIX)               \
     HASHMAP_INIT(KTYPE, VTYPE, SUFFIX)                  \
-    HASHMAP_PUT(KTYPE, VTYPE, SUFFIX)
+    HASHMAP_PUT(KTYPE, VTYPE, SUFFIX)                   \
+    HASHMAP_GET(KTYPE, VTYPE, SUFFIX)
