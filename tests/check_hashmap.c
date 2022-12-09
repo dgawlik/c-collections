@@ -66,6 +66,25 @@ START_TEST(test_get)
 }
 END_TEST
 
+START_TEST(test_remove)
+{
+    struct hashmap_context_i ctx = hashmap_init3_i(hash_code, equals, 1);
+
+    hashmap_put_i(&ctx, 0, 1);
+    hashmap_put_i(&ctx, 1, 0);
+    hashmap_put_i(&ctx, 4, 2);
+
+    ck_assert(hashmap_remove_i(&ctx, 4) == HASH_OK);
+    ck_assert(hashmap_remove_i(&ctx, 4) == HASH_NOT_FOUND);
+
+    ck_assert(hashmap_remove_i(&ctx, 0) == HASH_OK);
+    ck_assert(hashmap_remove_i(&ctx, 0) == HASH_NOT_FOUND);
+
+    ck_assert(hashmap_remove_i(&ctx, 1) == HASH_OK);
+    ck_assert(hashmap_remove_i(&ctx, 1) == HASH_NOT_FOUND);
+}
+END_TEST
+
 
 #define TEST_ADD(label, var, test)      \
     TCase* var = tcase_create(label);   \
@@ -79,6 +98,8 @@ Suite * tests(void)
 
     TEST_ADD("Init", tc_init, test_init);
     TEST_ADD("Put", tc_put, test_put);
+    TEST_ADD("Get", tc_get, test_get);
+    TEST_ADD("Remove", tc_remove, test_remove);
 
     return s;
 }

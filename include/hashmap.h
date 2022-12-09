@@ -60,13 +60,13 @@ enum hash_status {
     {                                                                                                                                    \
         if(ctx->count == ctx->capacity)                                                                                                  \
         {                                                                                                                                \
-             struct hashmap_context_##SUFFIX newCtx = hashmap_init3_##SUFFIX(ctx->hash_code, ctx->equals, 2*ctx->capacity);            \
+             struct hashmap_context_##SUFFIX newCtx = hashmap_init3_##SUFFIX(ctx->hash_code, ctx->equals, 2*ctx->capacity);              \
                                                                                                                                          \
              for(int i=0;i<ctx->capacity;i++)                                                                                            \
              {                                                                                                                           \
                 if(ctx->buckets[i] != NULL)                                                                                              \
                 {                                                                                                                        \
-                    struct hashmap_value_node_##SUFFIX* node = ctx->buckets[i];                                                                 \
+                    struct hashmap_value_node_##SUFFIX* node = ctx->buckets[i];                                                          \
                     while(node != NULL)                                                                                                  \
                     {                                                                                                                    \
                         hashmap_put_##SUFFIX(&newCtx, node->key, node->value);                                                           \
@@ -94,7 +94,7 @@ enum hash_status {
                                                                                                                                          \
         struct hashmap_value_node_##SUFFIX* prev = NULL;                                                                                 \
         struct hashmap_value_node_##SUFFIX* it = ctx->buckets[hash];                                                                     \
-        while(it != NULL)                                                                                                      \
+        while(it != NULL)                                                                                                                \
         {                                                                                                                                \
             if(ctx->equals(key, it->key))                                                                                                \
             {                                                                                                                            \
@@ -119,7 +119,7 @@ enum hash_status {
 #define HASHMAP_GET(KTYPE, VTYPE, SUFFIX)                                                                   \
     enum hash_status hashmap_get_##SUFFIX(struct hashmap_context_##SUFFIX* ctx, KTYPE key, VTYPE* value)    \
     {                                                                                                       \
-        int hash = ctx->hash_code(key);                                                                     \
+        int hash = ctx->hash_code(key) % ctx->capacity;                                                     \
                                                                                                             \
         if(ctx->buckets[hash] == NULL)                                                                      \
         {                                                                                                   \
@@ -142,8 +142,42 @@ enum hash_status {
     }                                                                                                       \
 
 
+#define HASHMAP_REMOVE(KTYPE, VTYPE, SUFFIX)                                                                \
+    enum hash_status hashmap_remove_##SUFFIX(struct hashmap_context_##SUFFIX* ctx, KTYPE key)               \
+    {                                                                                                       \
+        int hash = ctx->hash_code(key) % ctx->capacity;                                                     \
+                                                                                                            \
+        if(ctx->buckets[hash] == NULL)                                                                      \
+        {                                                                                                   \
+            return HASH_NOT_FOUND;                                                                          \
+        }                                                                                                   \
+                                                                                                            \
+        struct hashmap_value_node_##SUFFIX* prev = NULL;                                                    \
+        struct hashmap_value_node_##SUFFIX** it = &(ctx->buckets[hash]);                                    \
+        while(*it != NULL)                                                                                  \
+        {                                                                                                   \
+            if(ctx->equals(key, (*it)->key))                                                                \
+            {                                                                                               \
+                if(prev != NULL)                                                                            \
+                {                                                                                           \
+                    prev->next = (*it)->next;                                                               \
+                }                                                                                           \
+                free((*it));                                                                                \
+                *it = NULL;                                                                                 \
+                return HASH_OK;                                                                             \
+            }                                                                                               \
+                                                                                                            \
+            prev = *it;                                                                                     \
+            it = &((*it)->next);                                                                            \
+        }                                                                                                   \
+                                                                                                            \
+        return HASH_NOT_FOUND;                                                                              \
+    }                                                                                                       \
+
+
 #define HASHMAP_DEFINE_ALL(KTYPE, VTYPE, SUFFIX)        \
     HASHMAP_CONTEXT(KTYPE, VTYPE, SUFFIX)               \
     HASHMAP_INIT(KTYPE, VTYPE, SUFFIX)                  \
     HASHMAP_PUT(KTYPE, VTYPE, SUFFIX)                   \
-    HASHMAP_GET(KTYPE, VTYPE, SUFFIX)
+    HASHMAP_GET(KTYPE, VTYPE, SUFFIX)                   \
+    HASHMAP_REMOVE(KTYPE, VTYPE, SUFFIX)
