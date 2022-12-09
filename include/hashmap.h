@@ -1,8 +1,4 @@
-#include <stdlib.h>
-#include <stdarg.h>
-#include <check.h>
-#include "vector.h"
-
+#include "common.h"
 
 enum hash_status {
     HASH_OK,

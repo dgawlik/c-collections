@@ -1,6 +1,4 @@
-#include <stdlib.h>
-#include <stdarg.h>
-#include <check.h>
+#include "common.h"
 
 
 enum vector_status {
@@ -266,19 +264,6 @@ enum vector_status {
         ctx->array[idx] = elem;                                                                      \
         return OK;                                                                                   \
     }  
-
-
-char* string_concat(char* lhs, char* rhs)
-{
-    int len_lhs = strlen(lhs);
-    int len_rhs = strlen(rhs);
-
-    char* new_str = (char*) malloc((len_lhs+len_rhs+1)*sizeof(char));
-    strcpy(new_str, lhs); 
-    new_str = strcat(new_str, rhs); 
-
-    return new_str;
-}
 
 
 #define VECTOR_TO_STRING(TYPE, SUFFIX)                                                               \
