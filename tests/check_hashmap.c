@@ -11,7 +11,7 @@ HASHMAP_DEFINE_ALL(int, int, i);
 
 int equals(int l, int r)
 {
-    return l == r;
+    return l == r ? 1 : 0;
 }
 
 int hash_code(int k)
@@ -22,21 +22,23 @@ int hash_code(int k)
 
 START_TEST(test_init)
 {
-    struct hashmap_context_i ctx = hashmap_init_i(&hash_code, &equals);
+    struct hashmap_context_i ctx = hashmap_init_i(hash_code, equals);
 }
 END_TEST
 
 START_TEST(test_put)
 {
-    struct hashmap_context_i ctx = hashmap_init3_i(&hash_code, &equals, 1);
+    struct hashmap_context_i ctx = hashmap_init3_i(hash_code, equals, 1);
 
     hashmap_put_i(&ctx, 0, 1);
     hashmap_put_i(&ctx, 1, 0);
+    hashmap_put_i(&ctx, 4, 2);
 
-    ck_assert_int_eq(ctx.capacity, 2);
-    ck_assert_int_eq(ctx.count, 2);
+    ck_assert_int_eq(ctx.capacity, 4);
+    ck_assert_int_eq(ctx.count, 3);
 
     ck_assert_int_eq(ctx.buckets[0]->value, 1);
+    ck_assert_int_eq(ctx.buckets[0]->next->value, 2);
     ck_assert_int_eq(ctx.buckets[1]->value, 0);
 }
 END_TEST

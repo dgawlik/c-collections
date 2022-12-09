@@ -34,7 +34,7 @@ enum hash_status {
         struct hashmap_context_##SUFFIX ctx;                                                                                  \
         ctx.count = 0;                                                                                                        \
         ctx.capacity = 10;                                                                                                    \
-        ctx.buckets = (struct hashmap_value_node_##SUFFIX*)calloc(10, sizeof(struct hashmap_value_node_##SUFFIX*));            \
+        ctx.buckets = (struct hashmap_value_node_##SUFFIX**)calloc(10, sizeof(struct hashmap_value_node_##SUFFIX*));          \
         ctx.hash_code = hash_code;                                                                                            \
         ctx.equals = equals;                                                                                                  \
                                                                                                                               \
@@ -46,7 +46,7 @@ enum hash_status {
         struct hashmap_context_##SUFFIX ctx;                                                                                             \
         ctx.count = 0;                                                                                                                   \
         ctx.capacity = size;                                                                                                             \
-        ctx.buckets = (struct hashmap_value_node_##SUFFIX*)calloc(size, sizeof(struct hashmap_value_node_##SUFFIX*));                     \
+        ctx.buckets = (struct hashmap_value_node_##SUFFIX**)calloc(size, sizeof(struct hashmap_value_node_##SUFFIX*));                   \
         ctx.hash_code = hash_code;                                                                                                       \
         ctx.equals = equals;                                                                                                             \
                                                                                                                                          \
@@ -60,7 +60,7 @@ enum hash_status {
     {                                                                                                                                    \
         if(ctx->count == ctx->capacity)                                                                                                  \
         {                                                                                                                                \
-             struct hashmap_context_##SUFFIX newCtx = hashmap_init3_##SUFFIX(ctx->hash_code, &ctx->equals, 2*ctx->capacity);            \
+             struct hashmap_context_##SUFFIX newCtx = hashmap_init3_##SUFFIX(ctx->hash_code, ctx->equals, 2*ctx->capacity);            \
                                                                                                                                          \
              for(int i=0;i<ctx->capacity;i++)                                                                                            \
              {                                                                                                                           \
@@ -82,7 +82,7 @@ enum hash_status {
                                                                                                                                          \
         if(ctx->buckets[hash] == NULL)                                                                                                   \
         {                                                                                                                                \
-            struct hashmap_value_node_##SUFFIX* node = (struct hashmap_value_node_##SUFFIX*)malloc(sizeof(struct hashmap_value_node_##SUFFIX));      \
+            struct hashmap_value_node_##SUFFIX* node = (struct hashmap_value_node_##SUFFIX*)calloc(1, sizeof(struct hashmap_value_node_##SUFFIX));      \
             node->key = key;                                                                                                             \
             node->value = value;                                                                                                         \
             node->next = NULL;                                                                                                           \
@@ -92,35 +92,29 @@ enum hash_status {
             return;                                                                                                                      \
         }                                                                                                                                \
                                                                                                                                          \
-        int found = 0;                                                                                                                   \
         struct hashmap_value_node_##SUFFIX* prev = NULL;                                                                                 \
         struct hashmap_value_node_##SUFFIX* it = ctx->buckets[hash];                                                                     \
         while(it != NULL)                                                                                                      \
         {                                                                                                                                \
             if(ctx->equals(key, it->key))                                                                                                \
             {                                                                                                                            \
-                found = 1;                                                                                                               \
-                break;                                                                                                                   \
+                it->value = value;                                                                                                       \
+                return;                                                                                                                  \
             }                                                                                                                            \
-            else                                                                                                                         \
-            {                                                                                                                            \
-                prev = it;                                                                                                               \
-                it = it->next;                                                                                                           \
-            }                                                                                                                            \
+                                                                                                                                         \
+            prev = it;                                                                                                                   \
+            it = it->next;                                                                                                               \
         }                                                                                                                                \
                                                                                                                                          \
-        if(!found)                                                                                                                       \
-        {                                                                                                                                \
-           struct hashmap_value_node_##SUFFIX* node = (struct hashmap_value_node_##SUFFIX*)malloc(sizeof(struct hashmap_value_node_##SUFFIX));    \
-           node->key = key;                                                                                                             \
-           node->value = value;                                                                                                         \
-           node->next = NULL;                                                                                                           \
-                                                                                                                                        \
-           prev->next = node;                                                                                                           \
-           ctx->count++;                                                                                                                \
-        }                                                                                                                               \
-                                                                                                                                        \
-    }                                                                                                                                   \
+        struct hashmap_value_node_##SUFFIX* node = (struct hashmap_value_node_##SUFFIX*)calloc(1, sizeof(struct hashmap_value_node_##SUFFIX));    \
+        node->key = key;                                                                                                                 \
+        node->value = value;                                                                                                             \
+        node->next = NULL;                                                                                                               \
+                                                                                                                                         \
+        prev->next = node;                                                                                                               \
+        ctx->count++;                                                                                                                    \
+                                                                                                                                         \
+    }                                                                                                                                    \
 
 
 #define HASHMAP_DEFINE_ALL(KTYPE, VTYPE, SUFFIX)        \
