@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <check.h>
+#include "vector.h"
 
 
 enum hash_status {
@@ -185,10 +186,43 @@ enum hash_status {
     }                                                                                                       \
 
 
+#define HASHMAP_KEY_COUNT(KTYPE, VTYPE, SUFFIX)                              \
+    int hashmap_key_count_##SUFFIX(struct hashmap_context_##SUFFIX* ctx)     \
+    {                                                                        \
+        return ctx->count;                                                   \
+    }                                                                        \
+
+#define HASHMAP_KEYS(KTYPE, VTYPE, SUFFIX)                                  \
+    KTYPE* hashmap_keys_##SUFFIX(struct hashmap_context_##SUFFIX* ctx)      \
+    {                                                                       \
+        KTYPE* keys = (KTYPE*) calloc(ctx->count, sizeof(KTYPE));           \
+                                                                            \
+        int i=0;                                                            \
+        for(int j=0;j<ctx->capacity;j++)                                    \
+        {                                                                   \
+            if(ctx->buckets[j] != NULL)                                     \
+            {                                                               \
+                struct hashmap_value_node_##SUFFIX* it = ctx->buckets[j];   \
+                while(it != NULL)                                           \
+                {                                                           \
+                    keys[i++] = it->key;                                    \
+                    it = it->next;                                          \
+                }                                                           \
+                                                                            \
+            }                                                               \
+        }                                                                   \
+                                                                            \
+        return keys;                                                        \
+    }                                                                       \
+
+
+
 #define HASHMAP_DEFINE_ALL(KTYPE, VTYPE, SUFFIX)        \
     HASHMAP_CONTEXT(KTYPE, VTYPE, SUFFIX)               \
     HASHMAP_INIT(KTYPE, VTYPE, SUFFIX)                  \
     HASHMAP_PUT(KTYPE, VTYPE, SUFFIX)                   \
     HASHMAP_GET(KTYPE, VTYPE, SUFFIX)                   \
     HASHMAP_REMOVE(KTYPE, VTYPE, SUFFIX)                \
-    HASHMAP_CONTAINS_KEY(KTYPE, VTYPE, SUFFIX)
+    HASHMAP_CONTAINS_KEY(KTYPE, VTYPE, SUFFIX)          \
+    HASHMAP_KEY_COUNT(KTYPE, VTYPE, SUFFIX)             \
+    HASHMAP_KEYS(KTYPE, VTYPE, SUFFIX)

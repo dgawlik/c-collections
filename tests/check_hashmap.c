@@ -95,6 +95,23 @@ START_TEST(test_contains_key)
 }
 END_TEST
 
+START_TEST(test_keys)
+{
+    struct hashmap_context_i ctx = hashmap_init3_i(hash_code, equals, 1);
+    hashmap_put_i(&ctx, 0, 1);
+    hashmap_put_i(&ctx, 1, 0);
+    hashmap_put_i(&ctx, 4, 2);   
+
+    int len = hashmap_key_count_i(&ctx);
+    ck_assert_int_eq(3, len);
+
+    int* keys = hashmap_keys_i(&ctx);
+    ck_assert_int_eq(0, keys[0]);
+    ck_assert_int_eq(4, keys[1]);
+    ck_assert_int_eq(1, keys[2]);
+}
+END_TEST
+
 
 #define TEST_ADD(label, var, test)      \
     TCase* var = tcase_create(label);   \
@@ -110,6 +127,8 @@ Suite * tests(void)
     TEST_ADD("Put", tc_put, test_put);
     TEST_ADD("Get", tc_get, test_get);
     TEST_ADD("Remove", tc_remove, test_remove);
+    TEST_ADD("Contains", tc_contains, test_contains_key);
+    TEST_ADD("Keys", tc_keys, test_keys);
 
     return s;
 }
