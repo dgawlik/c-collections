@@ -335,6 +335,29 @@ START_TEST(test_to_string)
 }
 END_TEST
 
+int compare(int lhs, int rhs)
+{
+    return lhs - rhs;
+}
+
+START_TEST(test_sort)
+{
+    struct vector_context_int ctx = vector_init0_int();
+
+    vector_push_last_int(&ctx, 5);
+    vector_push_last_int(&ctx, 4);
+    vector_push_last_int(&ctx, 3);
+    vector_push_last_int(&ctx, 2);
+    vector_push_last_int(&ctx, 1);
+
+    vector_sort_int(&ctx, compare);
+
+    char* repr = vector_to_string_int(&ctx, &fmt_op);
+
+    ck_assert_pstr_eq("[1, 2, 3, 4, 5]", repr);
+}
+END_TEST
+
 
 #define TEST_ADD(label, var, test)      \
     TCase* var = tcase_create(label);   \
