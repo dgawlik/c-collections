@@ -235,6 +235,36 @@ enum hash_status {
     }                                                                                                               \
 
 
+#define HASHMAP_TO_STRING(KTYPE, VTYPE, SUFFIX)                                                     \
+    char* hashmap_to_string_##SUFFIX(struct hashmap_context_##SUFFIX* ctx, char* (*key_fmt)(KTYPE key), char* (*value_fmt)(VTYPE value))    \
+    {                                                                                                \
+        char* buf = "{";                                                                             \
+        int i=0;                                                                                     \
+        int length = hashmap_key_count_##SUFFIX(ctx);                                                \
+        KTYPE* keys = hashmap_keys_##SUFFIX(ctx);                                                    \
+                                                                                                     \
+        for(;i<length-1;i++)                                                                         \
+        {                                                                                            \
+            buf = string_concat(buf, (*key_fmt)(keys[i]));                                           \
+            buf = string_concat(buf, " : ");                                                         \
+            VTYPE value;                                                                             \
+            hashmap_get_##SUFFIX(ctx, keys[i], &value);                                              \
+            buf = string_concat(buf, (*value_fmt)(value));                                           \
+            buf = string_concat(buf, ", ");                                                          \
+        }                                                                                            \
+        if(i<length)                                                                                 \
+        {                                                                                            \
+            buf = string_concat(buf, (*key_fmt)(keys[i]));                                           \
+            buf = string_concat(buf, " : ");                                                         \
+            VTYPE value;                                                                             \
+            hashmap_get_##SUFFIX(ctx, keys[i], &value);                                              \
+            buf = string_concat(buf, (*value_fmt)(value));                                           \
+        }                                                                                            \
+                                                                                                     \
+        return string_concat(buf, "}");                                                              \
+    }                                                                                                \
+
+
 
 #define HASHMAP_DEFINE_ALL(KTYPE, VTYPE, SUFFIX)        \
     HASHMAP_CONTEXT(KTYPE, VTYPE, SUFFIX)               \
@@ -245,4 +275,5 @@ enum hash_status {
     HASHMAP_CONTAINS_KEY(KTYPE, VTYPE, SUFFIX)          \
     HASHMAP_KEY_COUNT(KTYPE, VTYPE, SUFFIX)             \
     HASHMAP_KEYS(KTYPE, VTYPE, SUFFIX)                  \
-    HASHMAP_DESTROY(KTYPE, VTYPE, SUFFIX)
+    HASHMAP_DESTROY(KTYPE, VTYPE, SUFFIX)               \
+    HASHMAP_TO_STRING(KTYPE, VTYPE, SUFFIX)

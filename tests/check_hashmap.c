@@ -23,6 +23,13 @@ void free_int()
 {
 
 }
+char* int_fmt(int el)
+{
+    int length = snprintf( NULL, 0, "%d", el );
+char* str = malloc( length + 1 );
+    snprintf( str, length + 1, "%d", el );
+    return str;
+}
 
 
 START_TEST(test_init)
@@ -127,6 +134,21 @@ START_TEST(test_keys)
 }
 END_TEST
 
+START_TEST(test_to_string)
+{
+    struct hashmap_context_i ctx = hashmap_init3_i(hash_code, equals, 1);
+    hashmap_put_i(&ctx, 1, 2);
+    hashmap_put_i(&ctx, 3, 4);
+    hashmap_put_i(&ctx, 5, 6);   
+
+    char* repr = hashmap_to_string_i(&ctx, int_fmt, int_fmt);
+
+    ck_assert_pstr_eq("{1 : 2, 5 : 6, 3 : 4}", repr);
+
+    hashmap_destroy_i(&ctx, free_int, free_int);
+}
+END_TEST
+
 
 #define TEST_ADD(label, var, test)      \
     TCase* var = tcase_create(label);   \
@@ -144,6 +166,7 @@ Suite * tests(void)
     TEST_ADD("Remove", tc_remove, test_remove);
     TEST_ADD("Contains", tc_contains, test_contains_key);
     TEST_ADD("Keys", tc_keys, test_keys);
+    TEST_ADD("ToString", tc_to_string, test_to_string);
 
     return s;
 }
