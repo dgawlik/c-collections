@@ -85,6 +85,16 @@ START_TEST(test_remove)
 }
 END_TEST
 
+START_TEST(test_contains_key)
+{
+    struct hashmap_context_i ctx = hashmap_init3_i(hash_code, equals, 1);
+    hashmap_put_i(&ctx, 0, 1);
+
+    ck_assert(hashmap_contains_key(&ctx, 0));
+    ck_assert(!hashmap_contains_key(&ctx, 1));
+}
+END_TEST
+
 
 #define TEST_ADD(label, var, test)      \
     TCase* var = tcase_create(label);   \

@@ -142,6 +142,8 @@ enum hash_status {
     }                                                                                                       \
 
 
+
+
 #define HASHMAP_REMOVE(KTYPE, VTYPE, SUFFIX)                                                                \
     enum hash_status hashmap_remove_##SUFFIX(struct hashmap_context_##SUFFIX* ctx, KTYPE key)               \
     {                                                                                                       \
@@ -175,9 +177,18 @@ enum hash_status {
     }                                                                                                       \
 
 
+#define HASHMAP_CONTAINS_KEY(KTYPE, VTYPE, SUFFIX)                                                          \
+    int hashmap_contains_key(struct hashmap_context_##SUFFIX* ctx, KTYPE key)                               \
+    {                                                                                                       \
+        VTYPE value;                                                                                        \
+        return hashmap_get_##SUFFIX(ctx, key, &value) == HASH_OK;                                           \
+    }                                                                                                       \
+
+
 #define HASHMAP_DEFINE_ALL(KTYPE, VTYPE, SUFFIX)        \
     HASHMAP_CONTEXT(KTYPE, VTYPE, SUFFIX)               \
     HASHMAP_INIT(KTYPE, VTYPE, SUFFIX)                  \
     HASHMAP_PUT(KTYPE, VTYPE, SUFFIX)                   \
     HASHMAP_GET(KTYPE, VTYPE, SUFFIX)                   \
-    HASHMAP_REMOVE(KTYPE, VTYPE, SUFFIX)
+    HASHMAP_REMOVE(KTYPE, VTYPE, SUFFIX)                \
+    HASHMAP_CONTAINS_KEY(KTYPE, VTYPE, SUFFIX)
