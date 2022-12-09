@@ -287,18 +287,14 @@ enum vector_status {
 #define VECTOR_SORT(TYPE, SUFFIX)                                                                                   \
     int _partition_##SUFFIX(struct vector_context_##SUFFIX* ctx, int (*compare)(TYPE lhs, TYPE rhs), int l, int r)  \
     {                                                                                                               \
-        int pivot = (l+r)/2;                                                                                        \
+        TYPE pivot = ctx->array[(l+r)/2];                                                                            \
                                                                                                                     \
-        TYPE t = ctx->array[r];                                                                                     \
-        ctx->array[r] = ctx->array[pivot];                                                                          \
-        ctx->array[pivot] = t;                                                                                      \
-                                                                                                                    \
-        int i=l,j=r-1;                                                                                              \
+        int i=l,j=r;                                                                                                \
         while(i < j)                                                                                                \
         {                                                                                                           \
-            if((*compare)(ctx->array[i], ctx->array[r]) > 0)                                                        \
+            if((*compare)(ctx->array[i], pivot) > 0)                                                                \
             {                                                                                                       \
-                t = ctx->array[i];                                                                                  \
+                TYPE t = ctx->array[i];                                                                                  \
                 ctx->array[i] = ctx->array[j];                                                                      \
                 ctx->array[j] = t;                                                                                  \
                 j--;                                                                                                \
@@ -306,7 +302,7 @@ enum vector_status {
             i++;                                                                                                    \
         }                                                                                                           \
                                                                                                                     \
-        return i == j ? j : j+1;                                                                                    \
+        return   j;                                                                                               \
     }                                                                                                               \
                                                                                                                     \
     void _quicksort_##SUFFIX(struct vector_context_##SUFFIX* ctx, int (*compare)(TYPE lhs, TYPE rhs), int l, int r) \
