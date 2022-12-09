@@ -216,6 +216,29 @@ enum hash_status {
     }                                                                       \
 
 
+#define HASHMAP_DESTROY(KTYPE, VTYPE, SUFFIX)                                                                       \
+    void hashmap_destroy_##SUFFIX(struct hashmap_context_##SUFFIX* ctx, void (*free_key)(), void (*free_value)())   \
+    {                                                                                                               \
+        for(int i=0;i<ctx->capacity;i++)                                                                            \
+        {                                                                                                           \
+            if(ctx->buckets[i] != NULL)                                                                             \
+            {                                                                                                       \
+                struct hashmap_value_node_##SUFFIX* it = ctx->buckets[i];                                           \
+                while(it != NULL)                                                                                   \
+                {                                                                                                   \
+                    struct hashmap_value_node_##SUFFIX* tmp = it;                                                   \
+                    it = it->next;                                                                                  \
+                    (*free_key)(tmp->key);                                                                          \
+                    (*free_value)(tmp->value);                                                                      \
+                    free(tmp);                                                                                      \
+                }                                                                                                   \
+            }                                                                                                       \
+        }                                                                                                           \
+                                                                                                                    \
+        free(ctx->buckets);                                                                                         \
+    }                                                                                                               \
+
+
 
 #define HASHMAP_DEFINE_ALL(KTYPE, VTYPE, SUFFIX)        \
     HASHMAP_CONTEXT(KTYPE, VTYPE, SUFFIX)               \
@@ -225,4 +248,5 @@ enum hash_status {
     HASHMAP_REMOVE(KTYPE, VTYPE, SUFFIX)                \
     HASHMAP_CONTAINS_KEY(KTYPE, VTYPE, SUFFIX)          \
     HASHMAP_KEY_COUNT(KTYPE, VTYPE, SUFFIX)             \
-    HASHMAP_KEYS(KTYPE, VTYPE, SUFFIX)
+    HASHMAP_KEYS(KTYPE, VTYPE, SUFFIX)                  \
+    HASHMAP_DESTROY(KTYPE, VTYPE, SUFFIX)

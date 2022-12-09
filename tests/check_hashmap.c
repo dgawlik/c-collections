@@ -19,10 +19,16 @@ int hash_code(int k)
     return k;
 }
 
+void free_int()
+{
+
+}
+
 
 START_TEST(test_init)
 {
     struct hashmap_context_i ctx = hashmap_init_i(hash_code, equals);
+    hashmap_destroy_i(&ctx, free_int, free_int);
 }
 END_TEST
 
@@ -40,6 +46,7 @@ START_TEST(test_put)
     ck_assert_int_eq(ctx.buckets[0]->value, 1);
     ck_assert_int_eq(ctx.buckets[0]->next->value, 2);
     ck_assert_int_eq(ctx.buckets[1]->value, 0);
+    hashmap_destroy_i(&ctx, free_int, free_int);
 }
 END_TEST
 
@@ -63,6 +70,8 @@ START_TEST(test_get)
 
     ck_assert(hashmap_get_i(&ctx, 3, &value) == HASH_NOT_FOUND);
 
+    hashmap_destroy_i(&ctx, free_int, free_int);
+
 }
 END_TEST
 
@@ -82,6 +91,8 @@ START_TEST(test_remove)
 
     ck_assert(hashmap_remove_i(&ctx, 1) == HASH_OK);
     ck_assert(hashmap_remove_i(&ctx, 1) == HASH_NOT_FOUND);
+
+    hashmap_destroy_i(&ctx, free_int, free_int);
 }
 END_TEST
 
@@ -92,6 +103,8 @@ START_TEST(test_contains_key)
 
     ck_assert(hashmap_contains_key(&ctx, 0));
     ck_assert(!hashmap_contains_key(&ctx, 1));
+
+    hashmap_destroy_i(&ctx, free_int, free_int);
 }
 END_TEST
 
@@ -109,6 +122,8 @@ START_TEST(test_keys)
     ck_assert_int_eq(0, keys[0]);
     ck_assert_int_eq(4, keys[1]);
     ck_assert_int_eq(1, keys[2]);
+
+    hashmap_destroy_i(&ctx, free_int, free_int);
 }
 END_TEST
 
