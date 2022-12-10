@@ -60,7 +60,7 @@ jobs:
       run: sudo apt-get install -y autoconf
 
     - name: Build
-    - run: |
+      run: |
        autoreconf --install
        ./configure
        make
