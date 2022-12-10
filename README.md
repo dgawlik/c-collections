@@ -157,7 +157,7 @@ Sorts the collection given compare function.
 ### Hashmap
 
 ```C
-HASHMAP_CONTEXT(KTYPE, VTYPE, SUFFIX)
+HASHMAP_DEFINE_ALL(KTYPE, VTYPE, SUFFIX) 
 ```
 Paste macro for key type, value type, functions and structures with given suffix.
 
