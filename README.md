@@ -153,3 +153,90 @@ void vector_sort_##SUFFIX(struct vector_context_##SUFFIX* ctx, int (*compare)(TY
 ```
 
 Sorts the collection given compare function.
+
+### Hashmap
+
+```C
+HASHMAP_CONTEXT(KTYPE, VTYPE, SUFFIX)
+```
+Paste macro for key type, value type, functions and structures with given suffix.
+
+```C
+ struct hashmap_context_##SUFFIX                     
+{                                                   
+    struct hashmap_value_node_##SUFFIX** buckets;   
+    int count;                                      
+    int capacity;                                   
+    int (*hash_code)(KTYPE val);                    
+    int (*equals)(KTYPE val1, KTYPE val2);          
+};     
+```
+
+State object, all operations use it.
+
+
+```C
+enum hash_status {
+    HASH_OK,
+    HASH_NOT_FOUND
+};
+```
+
+Statuses returned by functions.
+
+```C
+struct hashmap_context_##SUFFIX hashmap_init_##SUFFIX(int (*hash_code)(KTYPE val), int (*equals)(KTYPE val1, KTYPE val2))
+```
+
+Init hashmap to default size, with given hash code and equals functions.
+
+```C
+struct hashmap_context_##SUFFIX hashmap_init3_##SUFFIX(int (*hash_code)(KTYPE val), int (*equals)(KTYPE val1, KTYPE val2), int size)
+```
+
+Init hashmap to given size with hash code and equals functions.
+
+```C
+void hashmap_put_##SUFFIX(struct hashmap_context_##SUFFIX* ctx, KTYPE key, VTYPE value)
+```
+
+```C
+enum hash_status hashmap_get_##SUFFIX(struct hashmap_context_##SUFFIX* ctx, KTYPE key, VTYPE* value)
+```
+
+Returns HASH_OK or HASH_NOT_FOUND.
+
+
+```C
+enum hash_status hashmap_remove_##SUFFIX(struct hashmap_context_##SUFFIX* ctx, KTYPE key)
+```
+
+Returns HASH_OK or HASH_NOT_FOUND.
+
+```C
+int hashmap_contains_key(struct hashmap_context_##SUFFIX* ctx, KTYPE key)
+```
+
+Positive number if key is present in hashmap.
+
+```C
+int hashmap_key_count_##SUFFIX(struct hashmap_context_##SUFFIX* ctx)
+```
+
+Returns number of keys present in hashmap.
+
+```C
+KTYPE* hashmap_keys_##SUFFIX(struct hashmap_context_##SUFFIX* ctx)
+```
+
+Returns array of keys present in hashmap.
+
+```C
+void hashmap_destroy_##SUFFIX(struct hashmap_context_##SUFFIX* ctx, void (*free_key)(), void (*free_value)()) 
+```
+
+Free allocated resources with key and value finalizers.
+
+```C
+char* hashmap_to_string_##SUFFIX(struct hashmap_context_##SUFFIX* ctx, char* (*key_fmt)(KTYPE key), char* (*value_fmt)(VTYPE value))
+```
