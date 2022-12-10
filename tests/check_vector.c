@@ -358,6 +358,15 @@ START_TEST(test_sort)
 }
 END_TEST
 
+START_TEST(test_pop_empty)
+{
+    struct vector_context_int ctx = vector_init0_int();
+
+    int value;
+    ck_assert(vector_pop_last_int(&ctx, &value) == EMPTY);
+}
+END_TEST
+
 
 #define TEST_ADD(label, var, test)      \
     TCase* var = tcase_create(label);   \
@@ -385,6 +394,7 @@ Suite * tests(void)
     TEST_ADD("GetSet", tc_get_set, test_get_set);
     TEST_ADD("ToString", tc_to_string, test_to_string);
     TEST_ADD("Sort", tc_sort, test_sort);
+    TEST_ADD("Pop", tc_pop2, test_pop_empty);
 
     return s;
 }
