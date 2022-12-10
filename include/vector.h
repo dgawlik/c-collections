@@ -294,15 +294,18 @@ enum vector_status {
         {                                                                                                           \
             if((*compare)(ctx->array[i], pivot) > 0)                                                                \
             {                                                                                                       \
-                TYPE t = ctx->array[i];                                                                                  \
+                TYPE t = ctx->array[i];                                                                             \
                 ctx->array[i] = ctx->array[j];                                                                      \
                 ctx->array[j] = t;                                                                                  \
                 j--;                                                                                                \
             }                                                                                                       \
-            i++;                                                                                                    \
+            else                                                                                                    \
+            {                                                                                                       \
+                i++;                                                                                                \
+            }                                                                                                       \
         }                                                                                                           \
                                                                                                                     \
-        return   j;                                                                                               \
+        return   j;                                                                                                 \
     }                                                                                                               \
                                                                                                                     \
     void _quicksort_##SUFFIX(struct vector_context_##SUFFIX* ctx, int (*compare)(TYPE lhs, TYPE rhs), int l, int r) \
